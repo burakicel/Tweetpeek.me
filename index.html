@@ -24,6 +24,7 @@
                 center: latlng
             };
             map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+            placeMarker(latlng);
 
             // add a click event handler to the map object
             google.maps.event.addListener(map, "dbl_click", function(event)
