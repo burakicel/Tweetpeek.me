@@ -1,0 +1,81 @@
+<h1>Pages#home</h1>
+<%= @tweets %>
+<p>Find me in app/views/pages/home.html.erb</p>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map_canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script type="text/javascript">
+        var map;
+        var markersArray = [];
+
+        function initMap()
+        {
+            var latlng = new google.maps.LatLng(41, 29);
+            var myOptions = {
+                zoom: 10,
+                center: latlng
+            };
+            map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+            placeMarker(latlng);
+
+            // add a click event handler to the map object
+            google.maps.event.addListener(map, "dbl_click", function(event)
+            {
+                map.setCenter(event.latlng);
+                placeMarker(event.latlng);
+            });
+
+            google.maps.event.addListener(map, "center_changed", function()
+            {
+                // place a marker
+                placeMarker(map.getCenter());
+
+            });
+        }
+        function placeMarker(location) {
+            // first remove all markers if there are any
+            deleteOverlays();
+
+            var marker = new google.maps.Marker({
+                position: location, 
+                map: map
+            });
+
+            // add marker in markers array
+            markersArray.push(marker);
+
+            //map.setCenter(location);
+        }
+
+        // Deletes all markers in the array by removing references to them
+        function deleteOverlays() {
+            if (markersArray) {
+                for (i in markersArray) {
+                    markersArray[i].setMap(null);
+                }
+            markersArray.length = 0;
+            }
+        }
+    </script>
+</head>
+<body onload="initMap()">
+    <div id="map_canvas"></div>
+    <form class="searchbox" action="">
+        <input type="search" placeholder="search.." />
+    </form>
+    <div class="sidebar">
+    </div>
+</body>
+</html>
