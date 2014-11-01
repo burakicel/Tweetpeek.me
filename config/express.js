@@ -25,6 +25,42 @@ var fs = require('fs'),
 module.exports = function(db) {
 	// Initialize express app
 	var app = express();
+	var OAuth2 = require('oauth').OAuth2;
+	var https = require('https');
+
+var oauth2 = new OAuth2('c9XONlgyV6M2K2KJ8wkHk24UN', 'x0OUguws5mQ7siBTO5Z9YodTy9VqiaCv0XkvzX2t4GMahEW0Dw', 'https://api.twitter.com/', null, 'oauth2/token', null);
+
+	
+	app.get('/tweets', function(req, res) {
+
+
+oauth2.getOAuthAccessToken('', {
+    'grant_type': 'client_credentials'
+}, function (e, access_token) {
+    console.log(access_token); //string that we can use to authenticate request
+ 
+    var options = {
+        hostname: 'api.twitter.com',
+        path: '/1.1/search/tweets.json?q=&geocode=-22.912214,-43.230182,200km',
+        headers: {
+            Authorization: 'Bearer ' + access_token
+        }
+    };
+ 
+ 
+    https.get(options, function (result) {
+        var buffer = '';
+        result.setEncoding('utf8');
+        result.on('data', function (data) {
+            buffer += data;
+        });
+        result.on('end', function () {
+            var tweets = JSON.parse(buffer);
+	    res.send(tweets);
+        });
+    });
+});
+	});
 
 	// Globbing model files
 	config.getGlobbedFiles('./app/models/**/*.js').forEach(function(modelPath) {
