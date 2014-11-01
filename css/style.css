@@ -1,3 +1,14 @@
 #map_canvas {
 	width: 80%;
+	float: left;
+}
+
+.sidebar {
+	float: right;
+	width: 20%;
+	height: 100%;
+	background-color: #f5f7fa;
+	text-align: center;
+	color: #5d9cec;
+	border-left: thick solid #ffce54;
 }
