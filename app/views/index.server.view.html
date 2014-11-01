@@ -170,33 +170,29 @@ a{
           ne = bounds.getNorthEast();
 
           // r = radius of the earth in statute miles
-          var r = 3963.0;
+          var r = 3963.0;  
 
           // Convert lat or lng from decimal degrees into radians (divide by 57.2958)
-          var lat1 = center.lat() / 57.2958;
+          var lat1 = center.lat() / 57.2958; 
           var lon1 = center.lng() / 57.2958;
           var lat2 = ne.lat() / 57.2958;
           var lon2 = ne.lng() / 57.2958;
 
           // distance = circle radius from center to Northeast corner of bounds
-          var dis = r * Math.acos(Math.sin(lat1) * Math.sin(lat2) +
+          var dis = r * Math.acos(Math.sin(lat1) * Math.sin(lat2) + 
             Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
 
-          dis = dis * 1609/1000; // Miles to Kilometers
-          return dis;
+          dis = dist * 1609/1000; // Miles to Kilometers
+          return dist;
         }
 
-        function fetchTweets(center, radius, filter) {
-           var uri = encodeURI('/tweets?' + ((filter !== undefined && filter.length > 0) ? 'q=' + filter : '') + '&geocode=' + center.lat() + ',' + center.lng() + ',' + radius);
-          $.get(uri, function(data) {
-            tweets = data;
-          });
+        function fetchTweets(center, radius) {
         }
 
         // Get Tweets
         window.setInterval(function() {
-          data = fetchTweets(getCenter(), radius(), '');
-        }, 8000);
+          data = fetchTweets(getCenter(), radius()); 
+        }, 8000); 
 
     </script>
 </head>
