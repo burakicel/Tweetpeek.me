@@ -104,6 +104,7 @@ a{
     padding:10px;
 }
     </style>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
     <script type="text/javascript">
         var map;
@@ -182,16 +183,25 @@ a{
           var dis = r * Math.acos(Math.sin(lat1) * Math.sin(lat2) + 
             Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
 
-          dis = dist * 1609/1000; // Miles to Kilometers
-          return dist;
+          dis = dis * 1609/1000; // Miles to Kilometers
+          return dis;
         }
 
-        function fetchTweets(center, radius) {
+        function fetchTweets(center, radius, filter) {
+          var uri = '/tweets?';
+          if (filter !== undefined && filter.length > 0) {
+            uri = uri + 'q=' + filter;
+          }
+          uri = uri + '&geocode=' + center.lat() + ',' + center.lng() + ',' + radius;
+          uri = encodeURI(uri);
+          $.get(uri, function(data) {
+            tweets = data;
+          });
         }
 
         // Get Tweets
         window.setInterval(function() {
-          data = fetchTweets(getCenter(), radius()); 
+          data = fetchTweets(getCenter(), radius(), ''); 
         }, 8000); 
 
     </script>
