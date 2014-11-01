@@ -43,11 +43,13 @@ oauth2.getOAuthAccessToken('', {
 
     var options = {
         hostname: 'api.twitter.com',
-        path: encodeURI('/1.1/search/tweets.json?q=' + query.q + '&lat=' + query.lat + '&long=' + query.long + '&accuracy=' + query.radius + 'km'),
+        path: encodeURI('/1.1/search/tweets.json?q=' + query.q + '&geocode=' + query.geocode + 'km' + '&result_type=recent'),
         headers: {
             Authorization: 'Bearer ' + access_token
         }
     };
+
+    console.log(options.path);
 
     https.get(options, function (result) {
         var buffer = '';

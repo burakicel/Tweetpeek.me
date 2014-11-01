@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Simple Map</title>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
@@ -96,7 +97,7 @@ input[type="search"]:-ms-input-placeholder {  /* interner explorer*/
 a{
     display:block;
 /*removing underlines from anchor element*/
-    text-decoration:none; 
+    text-decoration:none;
     color:#5d9cec;
     font-size:30px;
     background-color:#f5f7fa;
@@ -106,6 +107,7 @@ a{
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
     <script type="text/javascript">
         var map;
+        var tweets = [];
         var markersArray = [];
 
         function initMap()
@@ -137,7 +139,7 @@ a{
             deleteOverlays();
 
             var marker = new google.maps.Marker({
-                position: location, 
+                position: location,
                 map: map
             });
 
@@ -156,6 +158,46 @@ a{
             markersArray.length = 0;
             }
         }
+
+        function getCenter() {
+          return map.getCenter();
+        }
+
+        function radius() {
+          bounds = map.getBounds();
+
+          center = bounds.getCenter();
+          ne = bounds.getNorthEast();
+
+          // r = radius of the earth in statute miles
+          var r = 3963.0;
+
+          // Convert lat or lng from decimal degrees into radians (divide by 57.2958)
+          var lat1 = center.lat() / 57.2958;
+          var lon1 = center.lng() / 57.2958;
+          var lat2 = ne.lat() / 57.2958;
+          var lon2 = ne.lng() / 57.2958;
+
+          // distance = circle radius from center to Northeast corner of bounds
+          var dis = r * Math.acos(Math.sin(lat1) * Math.sin(lat2) +
+            Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
+
+          dis = dis * 1609/1000; // Miles to Kilometers
+          return dis;
+        }
+
+        function fetchTweets(center, radius, filter) {
+           var uri = encodeURI('/tweets?' + ((filter !== undefined && filter.length > 0) ? 'q=' + filter : '') + '&geocode=' + center.lat() + ',' + center.lng() + ',' + radius);
+          $.get(uri, function(data) {
+            tweets = data;
+          });
+        }
+
+        // Get Tweets
+        window.setInterval(function() {
+          data = fetchTweets(getCenter(), radius(), '');
+        }, 8000);
+
     </script>
 </head>
 <body onload="initMap()">
