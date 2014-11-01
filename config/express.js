@@ -38,16 +38,17 @@ oauth2.getOAuthAccessToken('', {
     'grant_type': 'client_credentials'
 }, function (e, access_token) {
     console.log(access_token); //string that we can use to authenticate request
- 
+    
+    var query = req.query;
+
     var options = {
         hostname: 'api.twitter.com',
-        path: '/1.1/search/tweets.json?q=&geocode=-22.912214,-43.230182,200km',
+        path: encodeURI('/1.1/search/tweets.json?q=' + query.q + '&lat=' + query.lat + '&long=' + query.long + '&accuracy=' + query.radius + 'km'),
         headers: {
             Authorization: 'Bearer ' + access_token
         }
     };
- 
- 
+
     https.get(options, function (result) {
         var buffer = '';
         result.setEncoding('utf8');
