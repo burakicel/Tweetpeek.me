@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 'use strict';
 /**
  * Module dependencies.
