@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 'use strict';
 /**
  * Module dependencies.
@@ -66,14 +65,3 @@ exports = module.exports = app;
 
 // Logging initialization
 console.log('MEAN.JS application started on port ' + config.port);
-=======
-var app = require('express')();
-var http = require('http').Server(app);
-http.listen(3000, '127.0.0.1');
-
-app.get('/', function(req, res){
-    res.sendfile('index.html');
-});
-
-console.log('Server running at http://127.0.0.1:3000/');
->>>>>>> 2061ece4cc20801ab6c841098e2b1aaea3aa1403
