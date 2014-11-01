@@ -204,14 +204,24 @@ a{
           data = fetchTweets(getCenter(), radius(), ''); 
         }, 8000); 
 
+        $(document).ready(function() {
+          $("#splash").click(function() {
+            $("#splash").fadeOut(3000);
+          });
+        });
     </script>
 </head>
-<body onload="initMap()">
-    <div id="map_canvas"></div>
-    <form class="searchbox" action="">
-        <input type="search" placeholder="search.." />
-    </form>
-    <div class="sidebar">
+<body onload="initMap()" style="overflow: hidden">
+    <div id="container">
+      <div id="splash" style="z-index: 7; position: absolute;">
+        <img src="public/Indexpage.jpg" alt="starting" style="width: 100%;"></img>
+      </div>
+      <div id="map_canvas"></div>
+      <form class="searchbox" action="">
+          <input type="search" placeholder="search.." />
+      </form>
+      <div class="sidebar">
+      </div>
     </div>
 </body>
 </html>

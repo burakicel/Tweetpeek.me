@@ -31,6 +31,11 @@ module.exports = function(db) {
 var oauth2 = new OAuth2('c9XONlgyV6M2K2KJ8wkHk24UN', 'x0OUguws5mQ7siBTO5Z9YodTy9VqiaCv0XkvzX2t4GMahEW0Dw', 'https://api.twitter.com/', null, 'oauth2/token', null);
 
 	
+  app.get('/public/Indexpage.jpg', function(req, res) {
+    var img = fs.readFileSync('./public/Indexpage.jpg');
+    res.writeHead(200, {'Content-Type': 'image/gif' });
+    res.end(img, 'binary');
+  });
 	app.get('/tweets', function(req, res) {
 
 
@@ -84,6 +89,9 @@ oauth2.getOAuthAccessToken('', {
 		res.locals.url = req.protocol + '://' + req.headers.host + req.url;
 		next();
 	});
+
+	// Setting the app router and static folder
+	app.use(express.static(__dirname + '/public'));
 
 	// Should be placed before express.static
 	app.use(compress({
@@ -148,9 +156,6 @@ oauth2.getOAuthAccessToken('', {
 	app.use(helmet.nosniff());
 	app.use(helmet.ienoopen());
 	app.disable('x-powered-by');
-
-	// Setting the app router and static folder
-	app.use(express.static(path.resolve('./public')));
 
 	// Globbing routing files
 	config.getGlobbedFiles('./app/routes/**/*.js').forEach(function(routePath) {
