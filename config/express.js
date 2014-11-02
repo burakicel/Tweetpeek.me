@@ -90,7 +90,7 @@ module.exports = function(db) {
 */
 	app.get('/tweets', function(req, res) {
 
-var oauth2 = new OAuth2('1yox7gsaUR0Sqv8q5yIUji85e', 'HMeKBpB5qRAfqcvkUoP4qXC6ICZMMkRJ1py24p3QZjeIFt1GNA', 'https://api.twitter.com/', null, 'oauth2/token', null);
+var oauth2 = new OAuth2('j0FUlm9BPLGLKYSHazmgtpI4f', 'Qj6sLslyjVjBbykzRabUyewzLt5Arm8dqKLwAb9VNxvolVjUgi', 'https://api.twitter.com/', null, 'oauth2/token', null);
 oauth2.getOAuthAccessToken('', {
     'grant_type': 'client_credentials'
 }, function (e, access_token) {
