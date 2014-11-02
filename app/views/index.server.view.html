@@ -34,6 +34,11 @@
 	position: absolute;
 }
 
+.rounded {
+  border-radius: 15px;
+  -webkit-border-radius:15px;
+}
+
 .sidebar {
 	float: right;
 	width: 20%;
@@ -56,14 +61,14 @@
 .searchbox{
 /*definint width of form element*/
     width:482px;
-    	border: thick solid #5d9cec;
+ /*   	border: thick solid #5d9cec; */
 
 /*centering the form element*/
 }
 input[type="search"]{
     padding:10px 15px 10px 50px;
     font-size:15px;
-    color:#5d9cec;
+    color:#00ccf6;
     width: 482px;
 /*removing boder from search box*/
     border:none;
@@ -199,9 +204,13 @@ a{
           });
         }
 
+        function getFilter() {
+          return document.getElementById('searchBox').value;
+        }
+
         // Get Tweets
         window.setInterval(function() {
-          data = fetchTweets(getCenter(), radius(), ''); 
+          data = fetchTweets(getCenter(), radius(), getFilter()); 
         }, 8000); 
 
         $(document).ready(function() {
@@ -209,6 +218,7 @@ a{
             $("#splash").fadeOut(3000);
           });
         });
+        $(document).keypress(function(e) { if(e.keyCode === 13) { e.preventDefault(); return false; } });
     </script>
 </head>
 <body onload="initMap()" style="overflow: hidden">
@@ -218,7 +228,7 @@ a{
       </div>
       <div id="map_canvas"></div>
       <form class="searchbox" action="">
-          <input type="search" placeholder="search.." />
+          <input type="search" class="search rounded" id="searchBox" placeholder="filter.." />
       </form>
       <div class="sidebar">
       </div>
