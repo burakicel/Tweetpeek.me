@@ -27,18 +27,70 @@ module.exports = function(db) {
 	var app = express();
 	var OAuth2 = require('oauth').OAuth2;
 	var https = require('https');
-
-var oauth2 = new OAuth2('c9XONlgyV6M2K2KJ8wkHk24UN', 'x0OUguws5mQ7siBTO5Z9YodTy9VqiaCv0XkvzX2t4GMahEW0Dw', 'https://api.twitter.com/', null, 'oauth2/token', null);
-
 	
   app.get('/public/Indexpage.jpg', function(req, res) {
     var img = fs.readFileSync('./public/Indexpage.jpg');
     res.writeHead(200, {'Content-Type': 'image/gif' });
     res.end(img, 'binary');
   });
+  app.get('/public/lib/hello/dist/hello.all.min.js', function(req, res) {
+    var img = fs.readFileSync('./public/lib/hello/dist/hello.all.min.js');
+    res.writeHead(200, {'Content-Type': 'text/javascript' });
+    res.end(img, 'binary');
+  });
+
+  app.get('/places', function(req, res) {
+    var uri = '/maps/api/place/textsearch/json?query=' + req.query.query;
+    if (req.query.language !== undefined) {
+      uri = uri + '&language=' + req.query.language;
+    }
+    uri = uri + '&key=AIzaSyBXXWUbms4wO48NHxmFUPmVE0AlrY0ztZ8';
+    var options = {
+      hostname: 'maps.googleapis.com',
+      path: encodeURI(uri),
+    };
+
+    https.get(options, function(result) {
+      var buffer = '';
+      result.setEncoding('utf8');
+      result.on('data', function (data) {
+        buffer += data;
+      });
+      result.on('end', function() {
+        var tweets = JSON.parse(buffer);
+        res.send(tweets);
+      });
+    });
+  });
+
+/*
+  app.get('/placeId', function(req, res) {
+    var uri = '/maps/api/place/details/json?placeid=' + req.query.placeId;
+    uri = uri + '&key=AIzaSyBXXWUbms4wO48NHxmFUPmVE0AlrY0ztZ8';
+    var options = {
+      hostname: 'maps.googleapis.com',
+      path: encodeURI(uri),
+    };
+
+    console.log(uri);
+    console.log('!!!!!!!!!!!!!!');
+    https.get(options, function(result) {
+      var buffer = '';
+      result.setEncoding('utf8');
+      result.on('data', function(data) {
+        buffer += data;
+      });
+      result.on('end', function() {
+        var tweets = JSON.parse(buffer);
+        res.send(tweets); 
+      });
+    });
+  });
+
+*/
 	app.get('/tweets', function(req, res) {
 
-
+var oauth2 = new OAuth2('1yox7gsaUR0Sqv8q5yIUji85e', 'HMeKBpB5qRAfqcvkUoP4qXC6ICZMMkRJ1py24p3QZjeIFt1GNA', 'https://api.twitter.com/', null, 'oauth2/token', null);
 oauth2.getOAuthAccessToken('', {
     'grant_type': 'client_credentials'
 }, function (e, access_token) {
@@ -54,7 +106,7 @@ oauth2.getOAuthAccessToken('', {
         }
     };
 
-    console.log(options.path);
+    console.log('AUTHED');
 
     https.get(options, function (result) {
         var buffer = '';
@@ -64,7 +116,7 @@ oauth2.getOAuthAccessToken('', {
         });
         result.on('end', function () {
             var tweets = JSON.parse(buffer);
-	    res.send(tweets);
+        res.send(tweets);
         });
     });
 });

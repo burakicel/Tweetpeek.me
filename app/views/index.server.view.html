@@ -110,11 +110,13 @@ a{
 }
     </style>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
     <script type="text/javascript">
         var map;
         var tweets = [];
-        var markersArray = [];
+        var centerMarker;
+        var tweetMarkers = [];
+        var listArray = [];
 
         function initMap()
         {
@@ -152,19 +154,16 @@ a{
             });
 
             // add marker in markers array
-            markersArray.push(marker);
+            centerMarker = marker;
 
             //map.setCenter(location);
         }
 
-        // Deletes all markers in the array by removing references to them
+        // Delete main marker
         function deleteOverlays() {
-            if (markersArray) {
-                for (i in markersArray) {
-                    markersArray[i].setMap(null);
-                }
-            markersArray.length = 0;
-            }
+          if (centerMarker !== undefined) {
+            centerMarker.setMap(null);
+          }
         }
 
         function getCenter() {
@@ -178,19 +177,19 @@ a{
           ne = bounds.getNorthEast();
 
           // r = radius of the earth in statute miles
-          var r = 3963.0;  
+          var r = 3963.0;
 
           // Convert lat or lng from decimal degrees into radians (divide by 57.2958)
-          var lat1 = center.lat() / 57.2958; 
+          var lat1 = center.lat() / 57.2958;
           var lon1 = center.lng() / 57.2958;
           var lat2 = ne.lat() / 57.2958;
           var lon2 = ne.lng() / 57.2958;
 
           // distance = circle radius from center to Northeast corner of bounds
-          var dis = r * Math.acos(Math.sin(lat1) * Math.sin(lat2) + 
+          var dis = r * Math.acos(Math.sin(lat1) * Math.sin(lat2) +
             Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
 
-          dis = dis * 1609/1000; // Miles to Kilometers
+          dis = Math.floor(dis * 1609/1000 * 0.75); // Miles to Kilometers
           return dis;
         }
 
@@ -210,10 +209,98 @@ a{
           return document.getElementById('searchBox').value;
         }
 
+       function addMarker(tweet) {
+        var markerPosition;
+        if (tweet === undefined) {
+          return;
+        }
+        if (tweet.geo === undefined || tweet.geo === null) {
+          if (tweet.user.location === undefined && tweet.user.lang === undefined) {
+            return;
+          } else {
+            var input = tweet.user.location !== undefined ? tweet.user.location : '';
+            var language = tweet.user.lang !== undefined ? tweet.user.lang : '';
+            var uri = 'places?query=' + input + '&language=' + language;  
+            uri = encodeURI(uri);
+            $.get(uri, function(data) {
+              if (data.results.length <= 0) {
+                return;
+              }
+              var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(data.results[0].geometry.location.lat, data.results[0].geometry.location.lng),
+                map: map
+              });
+              tweetMarkers.push([marker, tweet]);
+              // remove if full
+              while (tweetMarkers.length > 7) {
+                listArray.push(tweetMarkers[0][1]);
+                tweetMarkers[0][0].setMap(null);
+                tweetMarkers = tweetMarkers.slice(1);
+              }
+              while (listArray.length > 14) {
+                listArray = listArray.slice(1);
+              }
+            });
+          }
+        } else {
+          markerPosition = new google.maps.LatLng(tweet.geo.coordinates[0], tweet.geo.coordinates[1])
+        }
+        var marker = new google.maps.Marker({
+          position: markerPosition,
+          map: map
+        });
+        tweetMarkers.push([marker, tweet]);
+        // remove if full
+        while (tweetMarkers.length > 7) {
+          listArray.push(tweetMarkers[0][1]);
+          tweetMarkers[0][0].setMap(null);
+          tweetMarkers = tweetMarkers.slice(1);
+        }
+        while (listArray.length > 14) {
+          listArray = listArray.slice(1);
+        }
+      }
+
         // Get Tweets
         window.setInterval(function() {
-          data = fetchTweets(getCenter(), radius(), getFilter()); 
-        }, 8000); 
+          fetchTweets(getCenter(), radius(), getFilter());
+        }, 8000);
+
+        // Select a tweet
+        window.setInterval(function() {
+          if (tweets === undefined || tweets.statuses === undefined) {
+            return;
+          }
+          do {
+            var tweet = tweets.statuses[Math.floor(Math.random() * tweets.statuses.length)];
+          } while (tweet === undefined);
+          addMarker(tweet);
+          }, 2000);
+
+        // Select a tweet
+        /*
+        window.setInterval(function() {
+          // Find a geo tweet.
+          var foundGeo = false;
+          if (tweets === undefined || tweets.statuses === undefined) {
+            return;
+          }
+          for (var i = 0; i < tweets.statuses.length; ++i) {
+           (function(i) {
+            if (tweets.statuses[i].geo !== null && listArray.indexOf(tweets.statuses[i]) === -1 && tweetMarkers.indexOf(tweets.statuses[i] === -1)) {
+              foundGeo = true;
+              addMarker(tweets.statuses[i]);
+            }
+           })(i);
+          }
+          if (foundGeo === false) {
+            do {
+            var tweet = tweets.statuses[Math.random(tweets.statuses.length)];
+            } while (tweet !== undefined);
+            addMarker(tweet);
+          }
+        }, 2000);
+        */
 
         $(document).ready(function() {
           $("#splash").click(function() {
