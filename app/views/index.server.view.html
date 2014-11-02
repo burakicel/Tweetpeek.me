@@ -66,7 +66,7 @@
 /*centering the form element*/
 }
 input[type="search"]{
-    padding:10px 15px 10px 50px;
+    padding:13px 0px 10px 50px;
     font-size:15px;
     color:#00ccf6;
     width: 482px;
@@ -82,7 +82,7 @@ input[type="search"]{
      -o-background-size:20px 20px;
         background-size:20px 20px;
 /*positioning background image*/
-    background-position:8px 12px;
+    background-position:20px 12px;
 /*changing background color form white*/
     background-color:#f5f7fa;
 }
@@ -121,7 +121,9 @@ a{
             var latlng = new google.maps.LatLng(41, 29);
             var myOptions = {
                 zoom: 10,
-                center: latlng
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                center: latlng,
+                styles: [{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#e0efef"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"hue":"#1900ff"},{"color":"#c0e8e8"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill"},{"featureType":"road","elementType":"geometry","stylers":[{"lightness":100},{"visibility":"simplified"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"water","stylers":[{"color":"#7dcdcd"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"visibility":"on"},{"lightness":700}]}]
             };
             map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
             placeMarker(latlng);
