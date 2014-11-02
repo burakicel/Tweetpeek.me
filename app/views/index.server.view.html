@@ -3,6 +3,8 @@
 <head>
     <title>Simple Map</title>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="markerwithlabel.js" type="text/javascript"></script>
+    <script src="Queue.js" type="text/javascript"></script>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
@@ -34,9 +36,16 @@
 	position: absolute;
 }
 
-.rounded {
-  border-radius: 15px;
-  -webkit-border-radius:15px;
+.tweets{
+    background-color:rgba(255,255,255,0.5);
+    text-align: center;
+    border-radius: 10px;
+    border: 1px solid black;
+    width:290px;
+    height:85px;
+    overflow:scroll;
+    clear: both;
+
 }
 
 .sidebar {
@@ -61,14 +70,14 @@
 .searchbox{
 /*definint width of form element*/
     width:482px;
- /*   	border: thick solid #5d9cec; */
+    	border: thick solid #5d9cec;
 
 /*centering the form element*/
 }
 input[type="search"]{
     padding:10px 15px 10px 50px;
     font-size:15px;
-    color:#00ccf6;
+    color:#5d9cec;
     width: 482px;
 /*removing boder from search box*/
     border:none;
@@ -109,8 +118,9 @@ a{
     padding:10px;
 }
     </style>
-    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+
+
     <script type="text/javascript">
         var map;
         var tweets = [];
@@ -192,8 +202,8 @@ a{
           return dis;
         }
 
-        function fetchTweets(center, radius, filter) {
-          var uri = '/tweets?';
+        function fetchTweets(center, radius,filter) {
+        var uri = '/tweets?';
           if (filter !== undefined && filter.length > 0) {
             uri = uri + 'q=' + filter;
           }
@@ -204,34 +214,97 @@ a{
           });
         }
 
-        function getFilter() {
-          return document.getElementById('searchBox').value;
-        }
-
         // Get Tweets
         window.setInterval(function() {
-          data = fetchTweets(getCenter(), radius(), getFilter()); 
+          data = fetchTweets(getCenter(), radius(), ""); 
         }, 8000); 
 
-        $(document).ready(function() {
-          $("#splash").click(function() {
-            $("#splash").fadeOut(3000);
-          });
-        });
-        $(document).keypress(function(e) { if(e.keyCode === 13) { e.preventDefault(); return false; } });
+        queue = new Queue()
+        screenQueue = new Queue()
+
+        function placeTweet(gettweet){
+        
+        tweet = JSON.parse(gettweet)
+
+        img = "<img src=" + tweet.user.profile_image_url_https + " alt='avatar' height='50' width='50' style='float:left'>" + tweet.user.screen_name + "<hr>"
+
+        permalink = "http://twitter.com/" + tweet.user.screen_name + "/status/" + tweet.id_str
+
+        var marker = new MarkerWithLabel({
+        position: new google.maps.LatLng(tweet.geo),
+        draggable: false,
+        map: null,
+        labelContent: img + tweet.text,
+        labelAnchor: new google.maps.Point(110,90),
+        labelClass: "tweets",
+    });
+
+/*
+    if ($('#div-id')[0].scrollWidth >  $('#div-id').innerWidth()) {
+    //Text has over-flowed
+    }
+*/
+   
+ google.maps.event.addListener(marker, "click", function (e) { window.open(permalink, '_blank');; });
+
+
+
+     }
+
+
+//displaying the tweets
+     function displayTweets(){
+
+        //put tweets in queue for slides
+
+        tweetdata = fetchTweets()
+
+        tweets = JSON.stringify(tweetdata)
+
+        
+
+        for (i=0;i<8;i++){
+            tweet = JSON.parse(tweets[i])
+            queue.enqueue(tweet)
+        }
+
+        //at the start display the items
+        if(Screenqueue.isEmpty()){
+
+            for(i=0;i<5;i++){
+                Screenqueue.queue(queue(i))
+            }
+
+
+        }
+
+
+        //display current items in queue
+        for(i=0;i<Screenqueue.getLength();i++){
+            //display screenqueue items
+            Screenqueue(i).map = map
+            //remove first element from queue
+            queue.dequeue(queue.peak())
+        }
+
+
+     }
+
+
+
+
+
+
+
+
     </script>
 </head>
-<body onload="initMap()" style="overflow: hidden">
-    <div id="container">
-      <div id="splash" style="z-index: 7; position: absolute;">
-        <img src="public/Indexpage.jpg" alt="starting" style="width: 100%;"></img>
-      </div>
-      <div id="map_canvas"></div>
-      <form class="searchbox" action="">
-          <input type="search" class="search rounded" id="searchBox" placeholder="filter.." />
-      </form>
-      <div class="sidebar">
-      </div>
+<body onload="initMap()">
+    <div id="map_canvas"></div>
+    <form class="searchbox" action="">
+        <input type="search" placeholder="search.." />
+    </form>
+    <div class="sidebar">
     </div>
 </body>
 </html>
